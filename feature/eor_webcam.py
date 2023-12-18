@@ -69,6 +69,11 @@ class EORWebcam:
                             10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
                         cv2.putText(frame, f"右目の距離: {right_eye_distance}", (
                             10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+                
+                # 目頭と目尻の距離を計算
+                left_eye_distance, right_eye_distance=self.eye_corner_detection()
+                print(f"左目の距離: {left_eye_distance}")
+                print(f"右目の距離: {right_eye_distance}")
 
                 # 画像を表示する
                 cv2.imshow('MediaPipe FaceMesh', frame)
@@ -76,7 +81,7 @@ class EORWebcam:
                 # 'q'キーが押されたらループを終了する
                 if cv2.waitKey(5) & 0xFF == ord('q'):
                     break
-
+        
         except Exception as e:
             print(f"エラーが発生しました: {str(e)}")
 
@@ -84,6 +89,46 @@ class EORWebcam:
             # カメラを解放し、OpenCVのウィンドウを閉じる
             self.cap.release()
             cv2.destroyAllWindows()
+
+    def eye_corner_detection(self):
+        if self.cap.isOpened():
+            ret, frame = self.cap.read()
+
+            # BGR画像をRGBに変換する
+            rgb_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+            # 顔のランドマークを検出する
+            results = self.face_mesh.process(rgb_image)
+
+            # 目頭と目尻のピクセル単位の距離を計算する
+            if results.multi_face_landmarks:
+                for face_landmarks in results.multi_face_landmarks:
+                    h, w, c = frame.shape
+                    for id, lm in enumerate(face_landmarks.landmark):
+                        # 目頭と目尻のランドマークを描画する
+                        if id in [33, 133, 362, 263]:
+                            cx, cy = int(lm.x * w), int(lm.y * h)
+                            # 丸で描画する
+                            cv2.circle(frame, (cx, cy), 1, (0, 255, 0), 1)
+
+                    # 左目の目頭と目尻の距離を計算する
+                    left_eye_start = np.array(
+                        [face_landmarks.landmark[33].x * w, face_landmarks.landmark[33].y * h])
+                    left_eye_end = np.array(
+                        [face_landmarks.landmark[133].x * w, face_landmarks.landmark[133].y * h])
+                    left_eye_distance = np.linalg.norm(
+                        left_eye_start - left_eye_end)
+
+                    # 右目の目頭と目尻の距離を計算する
+                    right_eye_start = np.array(
+                        [face_landmarks.landmark[362].x * w, face_landmarks.landmark[362].y * h])
+                    right_eye_end = np.array(
+                        [face_landmarks.landmark[263].x * w, face_landmarks.landmark[263].y * h])
+                    right_eye_distance = np.linalg.norm(
+                        right_eye_start - right_eye_end)
+                    
+                    # 目頭と目尻の距離を返却する
+                    return left_eye_distance, right_eye_distance
 
 # Create an instance of the WebcamFaceMesh class and run the program
 eor_webcom = EORWebcam()
