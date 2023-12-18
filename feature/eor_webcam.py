@@ -48,7 +48,7 @@ try:
                         cx, cy = int(lm.x * w), int(lm.y * h)
                         # 線で描画する
                         cv2.line(frame, (cx - 20, cy),
-                                 (cx + 20, cy), (0, 255, 0), 1)
+                                (cx + 20, cy), (0, 255, 0), 1)
 
                 # 左目の上まぶたと下まぶたの距離を計算する
                 left_eye_top = np.array(
