@@ -80,16 +80,15 @@ class EORWebcam:
                         right_eye_corner_distance = np.linalg.norm(
                             right_eye_start - right_eye_end)
 
-                        # フレーム上に距離を表示する
-                        cv2.putText(frame, f"left_eye_cleft: {left_eye_distance}", (
-                            10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-                        cv2.putText(frame, f"right_eye_cleft: {right_eye_distance}", (
-                            10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-                        cv2.putText(frame, f"left_eye_corner: {left_eye_corner_distance}", (
-                            10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-                        cv2.putText(frame, f"right_eye_corner: {right_eye_corner_distance}", (
-                            10, 120), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-                
+                        # 目頭と目尻の距離を1としたときの上まぶたと下まぶたの距離を計算する
+                        left_eye_distance = left_eye_distance / left_eye_corner_distance
+                        right_eye_distance = right_eye_distance / right_eye_corner_distance
+
+                        # openCVのウィンドウに表示する、文字を赤色で描画する
+                        cv2.putText(frame, f"left_eye: {left_eye_distance}", (
+                            10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                        cv2.putText(frame, f"right_eye: {right_eye_distance}", (
+                            10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
                 # 画像を表示する
                 cv2.imshow('MediaPipe FaceMesh', frame)
