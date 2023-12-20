@@ -1,3 +1,4 @@
 # .venvディレクトリをignoreして
 .venv/
 .env
+data/
