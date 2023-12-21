@@ -30,8 +30,8 @@ class EORWebcam:
         self.average = self.df.mean()
 
         #self.averageのlefe_eyeとright_eyeの値を取得する
-        self.average_left_eye_distance = self.average[0]
-        self.average_right_eye_distance = self.average[1]
+        self.average_left_eye_distance = self.average.iloc[0]
+        self.average_right_eye_distance = self.average.iloc[1]
 
     def run(self):
         try:
