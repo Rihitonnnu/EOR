@@ -3,6 +3,7 @@ os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
 import cv2
 import mediapipe as mp
 import numpy as np
+import pandas as pd
 
 class EORWebcam:
     def __init__(self):
@@ -22,6 +23,15 @@ class EORWebcam:
         self.frame_height = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         print(f'frame_width: {self.frame_width}')
         print(f'frame_height: {self.frame_height}')
+
+        # data/kawanishi/eor_base.xlsxを読み込む
+        self.df = pd.read_excel('../data/kawanishi/eor_base.xlsx', sheet_name='Sheet')
+        # カラムごとの平均値を計算する
+        self.average = self.df.mean()
+
+        #self.averageのlefe_eyeとright_eyeの値を取得する
+        self.average_left_eye_distance = self.average[0]
+        self.average_right_eye_distance = self.average[1]
 
     def run(self):
         try:
@@ -84,11 +94,15 @@ class EORWebcam:
                         left_eye_distance = left_eye_distance / left_eye_corner_distance
                         right_eye_distance = right_eye_distance / right_eye_corner_distance
 
-                        # openCVのウィンドウに表示する、文字を赤色で描画する
-                        cv2.putText(frame, f"left_eye: {left_eye_distance}", (
-                            10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-                        cv2.putText(frame, f"right_eye: {right_eye_distance}", (
-                            10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                        test1=left_eye_distance/self.average_left_eye_distance
+                        test2=right_eye_distance/self.average_right_eye_distance
+
+                        # openCVのputText関数を使って、画面にtest1,test2を表示する
+                        cv2.putText(frame, f'{test1:.2f}', (10, 30),
+                                    cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), thickness=2)
+                        cv2.putText(frame, f'{test2:.2f}', (10, 60),
+                                    cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), thickness=2)
+
 
                 # 画像を表示する
                 cv2.imshow('MediaPipe FaceMesh', frame)
