@@ -30,7 +30,7 @@ class EORBase:
         self.sheet = self.wb.active
         self.sheet['A1'] = 'left_eye_distance'
         self.sheet['B1'] = 'right_eye_distance'
-        self.wb.save('../data/eor_base.xlsx')
+        self.wb.save('../data/test/eor_base.xlsx')
 
     def run(self):
         try:
@@ -105,12 +105,13 @@ class EORBase:
                 #excelにleft_eye_distanceとright_eye_distanceを書き込む
                 self.sheet['A{}'.format(self.cnt+2)] = left_eye_distance
                 self.sheet['B{}'.format(self.cnt+2)] = right_eye_distance
-                self.wb.save('../data/kawanishi/eor_base.xlsx')
+                self.wb.save('../data/test/eor_base.xlsx')
 
                 self.cnt+=1
 
-                # 'q'キーが押されたらループを終了する
-                if cv2.waitKey(5) & 0xFF == ord('q'):
+
+                # 'q'キーが押された、または5秒たったらループを終了する
+                if cv2.waitKey(1) & 0xFF == ord('q') or self.cnt==150:
                     break
         
         except Exception as e:
