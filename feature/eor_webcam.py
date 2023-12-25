@@ -4,6 +4,8 @@ import cv2
 import mediapipe as mp
 import numpy as np
 import pandas as pd
+import socket
+import struct
 
 class EORWebcam:
     def __init__(self):
@@ -32,6 +34,10 @@ class EORWebcam:
         #self.averageのlefe_eyeとright_eyeの値を取得する
         self.average_left_eye_base = self.average.iloc[0]
         self.average_right_eye_base = self.average.iloc[1]
+    
+    def udp_send(self,data,server_ip,server_port):
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.sendto(struct.pack('d',data), (server_ip, server_port))
 
     def run(self):
         try:
@@ -103,6 +109,9 @@ class EORWebcam:
                                     cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), thickness=2)
                         cv2.putText(frame, f'{right_eye_opening_rate:.2f}', (10, 60),
                                     cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), thickness=2)
+                        
+                        # UDPで送信する
+                        self.udp_send(left_eye_opening_rate,'127.0.0.1',2002)
 
 
                 # 画像を表示する
