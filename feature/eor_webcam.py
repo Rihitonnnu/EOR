@@ -120,40 +120,6 @@ class EORWebcam:
             self.cap.release()
             cv2.destroyAllWindows()
 
-    # def eye_corner_detection(self):
-    #     if self.cap.isOpened():
-    #         ret, frame = self.cap.read()
-
-    #         # BGR画像をRGBに変換する
-    #         rgb_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
-    #         # 顔のランドマークを検出する
-    #         results = self.face_mesh.process(rgb_image)
-
-    #         # 目頭と目尻のピクセル単位の距離を計算する
-    #         if results.multi_face_landmarks:
-    #             for face_landmarks in results.multi_face_landmarks:
-    #                 h, w, c = frame.shape
-
-    #                 # 左目の目頭と目尻の距離を計算する
-    #                 left_eye_start = np.array(
-    #                     [face_landmarks.landmark[33].x * w, face_landmarks.landmark[33].y * h])
-    #                 left_eye_end = np.array(
-    #                     [face_landmarks.landmark[133].x * w, face_landmarks.landmark[133].y * h])
-    #                 left_eye_distance = np.linalg.norm(
-    #                     left_eye_start - left_eye_end)
-
-    #                 # 右目の目頭と目尻の距離を計算する
-    #                 right_eye_start = np.array(
-    #                     [face_landmarks.landmark[362].x * w, face_landmarks.landmark[362].y * h])
-    #                 right_eye_end = np.array(
-    #                     [face_landmarks.landmark[263].x * w, face_landmarks.landmark[263].y * h])
-    #                 right_eye_distance = np.linalg.norm(
-    #                     right_eye_start - right_eye_end)
-                    
-    #                 # 目頭と目尻の距離を返却する
-    #                 return left_eye_distance, right_eye_distance
-
 # Create an instance of the WebcamFaceMesh class and run the program
 eor_webcom = EORWebcam()
 eor_webcom.run()
