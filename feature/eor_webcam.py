@@ -30,8 +30,8 @@ class EORWebcam:
         self.average = self.df.mean()
 
         #self.averageのlefe_eyeとright_eyeの値を取得する
-        self.average_left_eye_distance = self.average.iloc[0]
-        self.average_right_eye_distance = self.average.iloc[1]
+        self.average_left_eye_base = self.average.iloc[0]
+        self.average_right_eye_base = self.average.iloc[1]
 
     def run(self):
         try:
@@ -94,13 +94,14 @@ class EORWebcam:
                         left_eye_distance = left_eye_distance / left_eye_corner_distance
                         right_eye_distance = right_eye_distance / right_eye_corner_distance
 
-                        test1=left_eye_distance/self.average_left_eye_distance
-                        test2=right_eye_distance/self.average_right_eye_distance
+                        # 開眼率の計算
+                        left_eye_opening_rate=left_eye_distance/self.average_left_eye_base*100
+                        right_eye_opening_rate=right_eye_distance/self.average_right_eye_base*100
 
-                        # openCVのputText関数を使って、画面にtest1,test2を表示する
-                        cv2.putText(frame, f'{test1:.2f}', (10, 30),
+                        # openCVのputText関数を使って、画面に左右の開眼率を表示する
+                        cv2.putText(frame, f'{left_eye_opening_rate:.2f}', (10, 30),
                                     cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), thickness=2)
-                        cv2.putText(frame, f'{test2:.2f}', (10, 60),
+                        cv2.putText(frame, f'{right_eye_opening_rate:.2f}', (10, 60),
                                     cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), thickness=2)
 
 
