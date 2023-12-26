@@ -31,6 +31,8 @@ while cap.isOpened():
                     # ランドマークを描画
                     h, w, c = frame.shape
                     cv2.circle(frame, (int(x0 * w), int(y0 * h)), 1, (0, 0, 255), -1)
+                    # 文字小さめで座標を表示
+                    # cv2.putText(frame, f'{x0}, {y0}, {z0}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 0 , 255), thickness=1)
                 
                 # 左目の目頭
                 elif id == 133:
@@ -41,8 +43,8 @@ while cap.isOpened():
                 
                 #　x0,y0,z0とx2,y2,z2のユークリッド距離を計算
                     eor = ((x0 - x2)**2 + (y0 - y2)**2 + (z0 - z2)**2)**(1/2)
-                    print(f'eor: {eor}')
-                
+                    cv2.putText(frame, f'{eor}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), thickness=2)
+                    # print(f'{eor}')
 
     # 画像を表示
     cv2.imshow('MediaPipe FaceMesh', frame)
