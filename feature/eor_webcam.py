@@ -8,7 +8,8 @@ import socket
 import struct
 
 class EORWebcam:
-    def __init__(self):
+    def __init__(self,name):
+        self.name=name
         # MediaPipeのFaceMeshモデルを初期化する
         mp_face_mesh = mp.solutions.face_mesh
         self.face_mesh = mp_face_mesh.FaceMesh()
@@ -27,7 +28,7 @@ class EORWebcam:
         print(f'frame_height: {self.frame_height}')
 
         # data/kawanishi/eor_base.xlsxを読み込む
-        self.df = pd.read_excel('../data/kawanishi/eor_base.xlsx', sheet_name='Sheet')
+        self.df = pd.read_excel('../data/{}/eor_base.xlsx'.format(self.name), sheet_name='Sheet')
         # カラムごとの平均値を計算する
         self.average = self.df.mean()
 
@@ -131,5 +132,5 @@ class EORWebcam:
             cv2.destroyAllWindows()
 
 # Create an instance of the WebcamFaceMesh class and run the program
-eor_webcom = EORWebcam()
-eor_webcom.run()
+# eor_webcom = EORWebcam()
+# eor_webcom.run()
