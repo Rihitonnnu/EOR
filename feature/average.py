@@ -1,7 +1,12 @@
 import pandas as pd
 
 
-df = pd.read_excel('../data/kawanishi/eor.xlsx', sheet_name='Sheet')
+df = pd.read_excel('../data/kawanishi/20231231/eor_16.xlsx', sheet_name='Sheet')
+
+#excelのカラムから110を超える値を削除する
+df = df[df['left_eye_opening_rate'] < 110]
+df = df[df['right_eye_opening_rate'] < 110]
+
 # カラムごとの平均値を計算する
 average = df.mean()
 
