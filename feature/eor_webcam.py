@@ -7,6 +7,7 @@ import pandas as pd
 import socket
 import struct
 import openpyxl
+import datetime
 
 class EORWebcam:
     def __init__(self,name):
@@ -126,7 +127,10 @@ class EORWebcam:
                         
                         # excelファイルに開眼率を書き込む
                         self.sheet.append([left_eye_opening_rate,right_eye_opening_rate])
-                        self.wb.save('../data/{}/eor.xlsx'.format(self.name))
+
+                        # 日時をファイル名にする
+                        now = datetime.datetime.now()
+                        self.wb.save('../data/{}/{}/eor_{}.xlsx'.format(self.name,now.strftime('%Y%m%d'),now.strftime('%H')))
 
                         self.cnt+=1
 
