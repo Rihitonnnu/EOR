@@ -54,7 +54,21 @@ class EORWebcam:
         # dataの中身はboolean型なので、int型に変換する
         sock.sendto(struct.pack('?',data), (server_ip, server_port))
 
-    def eor_judge(self):
+    # EORがしきい値を超えているかどうかの判定
+    def eor_judge(self,path):
+        df = pd.read_excel(path, sheet_name='Sheet')
+        #excelのカラムから110を超える値を削除する
+        df = df[df['left_eye_opening_rate'] < 110]
+        df = df[df['right_eye_opening_rate'] < 110]
+
+        # カラムごとの平均値を計算する
+        average = df.mean()
+
+        #averageのlefe_eyeとright_eyeの値を取得する
+        average_left_eye = average.iloc[0]
+        average_right_eye = average.iloc[1]
+
+        print(average_left_eye,average_right_eye)
         return True
 
     def run(self):
@@ -150,12 +164,13 @@ class EORWebcam:
                 # 画像を表示する
                 cv2.imshow('MediaPipe FaceMesh', frame)
 
-                # 'q'キーが押されたらループを終了する
-                if cv2.waitKey(5) & 0xFF == ord('q') or self.cnt==30:
+                # 1分間経過したらもしくは'q'キーが押されたらループを終了する
+                if cv2.waitKey(5) & 0xFF == ord('q') or self.cnt==300:
                     now = datetime.datetime.now()
-                    self.wb.save('../data/{}/{}/{}.xlsx'.format(self.name,now.strftime('%Y%m%d'),now.strftime('%H%M%S')))
+                    path='../data/{}/{}/{}.xlsx'.format(self.name,now.strftime('%Y%m%d'),now.strftime('%H%M%S'))
+                    self.wb.save(path)
 
-                    eor_judge=False
+                    eor_judge=self.eor_judge(path)
                     self.udp_send(eor_judge,'127.0.0.1',2002)
                     break
         
