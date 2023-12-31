@@ -37,7 +37,9 @@ class EORWebcam:
     
     def udp_send(self,data,server_ip,server_port):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.sendto(struct.pack('d',data), (server_ip, server_port))
+        # dataはリスト型なので、struct.packでバイナリに変換する
+        sock.sendto(struct.pack('dd',data[0],data[1]), (server_ip, server_port))
+        # sock.sendto(struct.pack('d',data), (server_ip, server_port))
 
     def run(self):
         try:
@@ -111,7 +113,7 @@ class EORWebcam:
                                     cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), thickness=2)
                         
                         # UDPで送信する
-                        self.udp_send(left_eye_opening_rate,'127.0.0.1',2002)
+                        self.udp_send([left_eye_opening_rate,right_eye_opening_rate],'127.0.0.1',2002)
 
 
                 # 画像を表示する
