@@ -39,7 +39,6 @@ class EORWebcam:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         # dataはリスト型なので、struct.packでバイナリに変換する
         sock.sendto(struct.pack('dd',data[0],data[1]), (server_ip, server_port))
-        # sock.sendto(struct.pack('d',data), (server_ip, server_port))
 
     def run(self):
         try:
