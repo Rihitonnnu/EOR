@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import socket
 import struct
+import openpyxl
 
 class EORWebcam:
     def __init__(self,name):
@@ -27,7 +28,7 @@ class EORWebcam:
         print(f'frame_width: {self.frame_width}')
         print(f'frame_height: {self.frame_height}')
 
-        # data/kawanishi/eor_base.xlsxを読み込む
+        # data/hoge/eor_base.xlsxを読み込む
         self.df = pd.read_excel('../data/{}/eor_base.xlsx'.format(self.name), sheet_name='Sheet')
         # カラムごとの平均値を計算する
         self.average = self.df.mean()
@@ -35,6 +36,13 @@ class EORWebcam:
         #self.averageのlefe_eyeとright_eyeの値を取得する
         self.average_left_eye_base = self.average.iloc[0]
         self.average_right_eye_base = self.average.iloc[1]
+
+        #excelファイルを作成し、1行目にleft_eye_opening_rateとright_eye_opening_rateを書き込む
+        self.wb = openpyxl.Workbook()
+        self.sheet = self.wb.active
+        self.sheet['A1'] = 'left_eye_opening_rate'
+        self.sheet['B1'] = 'right_eye_opening_rate'
+        self.wb.save('../data/{}/eor.xlsx'.format(self.name))
     
     def udp_send(self,data,server_ip,server_port):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -112,6 +120,9 @@ class EORWebcam:
                         cv2.putText(frame, f'{right_eye_opening_rate:.2f}', (10, 60),
                                     cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), thickness=2)
                         
+                        # excelファイルに開眼率を書き込む
+                        self.sheet.append([left_eye_opening_rate,right_eye_opening_rate])
+                        self.wb.save('../data/{}/eor.xlsx'.format(self.name))
                         # UDPで送信する
                         self.udp_send([left_eye_opening_rate,right_eye_opening_rate],'127.0.0.1',2002)
 
