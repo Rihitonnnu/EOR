@@ -54,6 +54,9 @@ class EORWebcam:
         # dataの中身はboolean型なので、int型に変換する
         sock.sendto(struct.pack('?',data), (server_ip, server_port))
 
+    def eor_judge(self):
+        return True
+
     def run(self):
         try:
             while self.cap.isOpened():
@@ -129,8 +132,7 @@ class EORWebcam:
                         self.sheet.append([left_eye_opening_rate,right_eye_opening_rate])
 
                         # 日時をファイル名にする
-                        now = datetime.datetime.now()
-                        self.wb.save('../data/{}/{}/eor_{}.xlsx'.format(self.name,now.strftime('%Y%m%d'),now.strftime('%H')))
+                        # self.wb.save('../data/{}/{}/eor_{}.xlsx'.format(self.name,now.strftime('%Y%m%d'),now.strftime('%H%m%s')))
 
                         self.cnt+=1
 
@@ -150,6 +152,9 @@ class EORWebcam:
 
                 # 'q'キーが押されたらループを終了する
                 if cv2.waitKey(5) & 0xFF == ord('q') or self.cnt==30:
+                    now = datetime.datetime.now()
+                    self.wb.save('../data/{}/{}/{}.xlsx'.format(self.name,now.strftime('%Y%m%d'),now.strftime('%H%M%S')))
+
                     eor_judge=False
                     self.udp_send(eor_judge,'127.0.0.1',2002)
                     break
