@@ -51,8 +51,8 @@ class EORWebcam:
     
     def udp_send(self,data,server_ip,server_port):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        # dataはリスト型なので、struct.packでバイナリに変換する
-        sock.sendto(struct.pack('dd',data[0],data[1]), (server_ip, server_port))
+        # dataの中身はboolean型なので、int型に変換する
+        sock.sendto(struct.pack('?',data), (server_ip, server_port))
 
     def run(self):
         try:
@@ -142,14 +142,16 @@ class EORWebcam:
                         # self.wb.save('../data/{}/eor.xlsx'.format(self.name))
 
                         # UDPで送信する
-                        self.udp_send([left_eye_opening_rate,right_eye_opening_rate],'127.0.0.1',2002)
-
+                        # self.udp_send([left_eye_opening_rate,right_eye_opening_rate],'127.0.0.1',2002)
+                        
 
                 # 画像を表示する
                 cv2.imshow('MediaPipe FaceMesh', frame)
 
                 # 'q'キーが押されたらループを終了する
-                if cv2.waitKey(5) & 0xFF == ord('q') or self.cnt==300:
+                if cv2.waitKey(5) & 0xFF == ord('q') or self.cnt==30:
+                    eor_judge=False
+                    self.udp_send(eor_judge,'127.0.0.1',2002)
                     break
         
         except Exception as e:
