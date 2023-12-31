@@ -10,7 +10,11 @@ import openpyxl
 
 class EORWebcam:
     def __init__(self,name):
+        # ファイル作成のための名前
         self.name=name
+
+        self.cnt=0
+
         # MediaPipeのFaceMeshモデルを初期化する
         mp_face_mesh = mp.solutions.face_mesh
         self.face_mesh = mp_face_mesh.FaceMesh()
@@ -123,6 +127,16 @@ class EORWebcam:
                         # excelファイルに開眼率を書き込む
                         self.sheet.append([left_eye_opening_rate,right_eye_opening_rate])
                         self.wb.save('../data/{}/eor.xlsx'.format(self.name))
+
+                        self.cnt+=1
+
+                        # excelファイルの中身をリセットする
+                        # self.wb = openpyxl.Workbook()
+                        # self.sheet = self.wb.active
+                        # self.sheet['A1'] = 'left_eye_opening_rate'
+                        # self.sheet['B1'] = 'right_eye_opening_rate'
+                        # self.wb.save('../data/{}/eor.xlsx'.format(self.name))
+
                         # UDPで送信する
                         self.udp_send([left_eye_opening_rate,right_eye_opening_rate],'127.0.0.1',2002)
 
@@ -131,7 +145,7 @@ class EORWebcam:
                 cv2.imshow('MediaPipe FaceMesh', frame)
 
                 # 'q'キーが押されたらループを終了する
-                if cv2.waitKey(5) & 0xFF == ord('q'):
+                if cv2.waitKey(5) & 0xFF == ord('q') or self.cnt==300:
                     break
         
         except Exception as e:
