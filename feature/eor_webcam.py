@@ -8,6 +8,7 @@ import socket
 import struct
 import openpyxl
 import datetime
+import beep
 
 class EORWebcam:
     def __init__(self,name):
@@ -47,7 +48,6 @@ class EORWebcam:
         self.sheet = self.wb.active
         self.sheet['A1'] = 'left_eye_opening_rate'
         self.sheet['B1'] = 'right_eye_opening_rate'
-        self.wb.save('../data/{}/eor.xlsx'.format(self.name))
     
     def udp_send(self,data,server_ip,server_port):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -58,8 +58,8 @@ class EORWebcam:
     def eor_judge(self,path):
         df = pd.read_excel(path, sheet_name='Sheet')
         #excelのカラムから110を超える値を削除する
-        df = df[df['left_eye_opening_rate'] < 110]
-        df = df[df['right_eye_opening_rate'] < 110]
+        df = df[df['left_eye_opening_rate'] < 105]
+        df = df[df['right_eye_opening_rate'] < 105]
 
         # カラムごとの平均値を計算する
         average = df.mean()
@@ -69,6 +69,10 @@ class EORWebcam:
         average_right_eye = average.iloc[1]
 
         print(average_left_eye,average_right_eye)
+
+        if average_left_eye <= 75 or average_right_eye <= 75:
+            return False
+        
         return True
 
     def run(self):
@@ -165,12 +169,14 @@ class EORWebcam:
                 cv2.imshow('MediaPipe FaceMesh', frame)
 
                 # 1分間経過したらもしくは'q'キーが押されたらループを終了する
-                if cv2.waitKey(5) & 0xFF == ord('q') or self.cnt==300:
+                if cv2.waitKey(5) & 0xFF == ord('q') or self.cnt==30:
+                    beep.high()
                     now = datetime.datetime.now()
                     path='../data/{}/{}/{}.xlsx'.format(self.name,now.strftime('%Y%m%d'),now.strftime('%H%M%S'))
                     self.wb.save(path)
 
                     eor_judge=self.eor_judge(path)
+                    print(eor_judge)
                     self.udp_send(eor_judge,'127.0.0.1',2002)
                     break
         
