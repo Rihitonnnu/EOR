@@ -168,7 +168,7 @@ class EORWebcam:
                 cv2.imshow('MediaPipe FaceMesh', frame)
 
                 # 1分間経過したらもしくは'q'キーが押されたらループを終了する
-                if cv2.waitKey(5) & 0xFF == ord('q') or self.cnt==1800:
+                if cv2.waitKey(5) & 0xFF == ord('q') or self.cnt==150:
                     now = datetime.datetime.now()
                     path='../data/{}/{}/{}.xlsx'.format(self.name,now.strftime('%Y%m%d'),now.strftime('%H%M%S'))
                     self.wb.save(path)
@@ -176,6 +176,12 @@ class EORWebcam:
                     is_sleepy=self.eor_judge(path)
                     print(is_sleepy)
                     self.udp_send(is_sleepy,'127.0.0.1',2002)
+
+                    # self.sheetの中身をリセットする
+                    self.wb = openpyxl.Workbook()
+                    self.sheet = self.wb.active
+                    self.sheet['A1'] = 'left_eye_opening_rate'
+                    self.sheet['B1'] = 'right_eye_opening_rate'
 
                     # 眠くなったらループを終了する
                     if is_sleepy:
