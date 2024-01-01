@@ -8,7 +8,6 @@ import socket
 import struct
 import openpyxl
 import datetime
-import beep
 
 class EORWebcam:
     def __init__(self,name):
@@ -170,7 +169,6 @@ class EORWebcam:
 
                 # 1分間経過したらもしくは'q'キーが押されたらループを終了する
                 if cv2.waitKey(5) & 0xFF == ord('q') or self.cnt==1800:
-                    beep.high()
                     now = datetime.datetime.now()
                     path='../data/{}/{}/{}.xlsx'.format(self.name,now.strftime('%Y%m%d'),now.strftime('%H%M%S'))
                     self.wb.save(path)
