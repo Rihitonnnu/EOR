@@ -71,9 +71,9 @@ class EORWebcam:
         print(average_left_eye,average_right_eye)
 
         if average_left_eye <= 75 or average_right_eye <= 75:
-            return False
+            return True
         
-        return True
+        return False
 
     def run(self):
         try:
@@ -175,10 +175,15 @@ class EORWebcam:
                     path='../data/{}/{}/{}.xlsx'.format(self.name,now.strftime('%Y%m%d'),now.strftime('%H%M%S'))
                     self.wb.save(path)
 
-                    eor_judge=self.eor_judge(path)
-                    print(eor_judge)
-                    self.udp_send(eor_judge,'127.0.0.1',2002)
-                    break
+                    is_sleepy=self.eor_judge(path)
+                    print(is_sleepy)
+                    self.udp_send(is_sleepy,'127.0.0.1',2002)
+
+                    # 眠くなったらループを終了する
+                    if is_sleepy:
+                        break
+
+                    self.cnt=0
         
         except Exception as e:
             print(f"エラーが発生しました: {str(e)}")
