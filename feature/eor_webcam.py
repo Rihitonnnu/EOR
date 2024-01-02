@@ -153,17 +153,6 @@ class EORWebcam:
 
                         self.cnt+=1
 
-                        # excelファイルの中身をリセットする
-                        # self.wb = openpyxl.Workbook()
-                        # self.sheet = self.wb.active
-                        # self.sheet['A1'] = 'left_eye_opening_rate'
-                        # self.sheet['B1'] = 'right_eye_opening_rate'
-                        # self.wb.save('../data/{}/eor.xlsx'.format(self.name))
-
-                        # UDPで送信する
-                        # self.udp_send([left_eye_opening_rate,right_eye_opening_rate],'127.0.0.1',2002)
-                        
-
                 # 画像を表示する
                 cv2.imshow('MediaPipe FaceMesh', frame)
 
