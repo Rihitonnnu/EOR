@@ -14,6 +14,8 @@ class EORWebcam:
         # ファイル作成のための名前
         self.name=name
 
+        self.now = datetime.datetime.now()
+
         self.cnt=0
 
         # MediaPipeのFaceMeshモデルを初期化する
@@ -51,7 +53,7 @@ class EORWebcam:
         # 動画ファイルの保存設定
         fourcc = cv2.VideoWriter_fourcc(*'XVID')
         # mp4ファイルで出力
-        self.output_file = cv2.VideoWriter('output.mp4', fourcc, 30.0, (640, 480))
+        self.output_file = cv2.VideoWriter('../data/{}/video/{}.mp4'.format(self.name,self.now.strftime('%Y%m%d%H%m%s')), fourcc, 30.0, (640, 480))
     
     def udp_send(self,data,server_ip,server_port):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -164,8 +166,7 @@ class EORWebcam:
 
                 # 1分間経過したらもしくは'q'キーが押されたらループを終了する
                 if cv2.waitKey(5) & 0xFF == ord('q') or self.cnt==1800:
-                    now = datetime.datetime.now()
-                    path='../data/{}/{}/{}.xlsx'.format(self.name,now.strftime('%Y%m%d'),now.strftime('%H%M%S'))
+                    path='../data/{}/{}/{}.xlsx'.format(self.name,self.now.strftime('%Y%m%d'),self.now.strftime('%H%M%S'))
                     self.wb.save(path)
 
                     is_sleepy=self.eor_judge(path)
