@@ -47,6 +47,11 @@ class EORWebcam:
         self.sheet = self.wb.active
         self.sheet['A1'] = 'left_eye_opening_rate'
         self.sheet['B1'] = 'right_eye_opening_rate'
+
+        # 動画ファイルの保存設定
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        # mp4ファイルで出力
+        self.output_file = cv2.VideoWriter('output.mp4', fourcc, 30.0, (640, 480))
     
     def udp_send(self,data,server_ip,server_port):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -96,8 +101,8 @@ class EORWebcam:
                             if id in [159, 145, 386, 374]:
                                 cx, cy = int(lm.x * w), int(lm.y * h)
                                 # 線で描画する
-                                cv2.line(frame, (cx - 20, cy),
-                                        (cx + 20, cy), (0, 255, 0), 1)
+                                # cv2.line(frame, (cx - 20, cy),
+                                #         (cx + 20, cy), (0, 255, 0), 1)
 
                         # 左目の上まぶたと下まぶたの距離を計算する
                         left_eye_top = np.array(
@@ -155,9 +160,10 @@ class EORWebcam:
 
                 # 画像を表示する
                 cv2.imshow('MediaPipe FaceMesh', frame)
+                self.output_file.write(frame)
 
                 # 1分間経過したらもしくは'q'キーが押されたらループを終了する
-                if cv2.waitKey(5) & 0xFF == ord('q') or self.cnt==150:
+                if cv2.waitKey(5) & 0xFF == ord('q') or self.cnt==1800:
                     now = datetime.datetime.now()
                     path='../data/{}/{}/{}.xlsx'.format(self.name,now.strftime('%Y%m%d'),now.strftime('%H%M%S'))
                     self.wb.save(path)
@@ -184,8 +190,10 @@ class EORWebcam:
         finally:
             # カメラを解放し、OpenCVのウィンドウを閉じる
             self.cap.release()
+            self.output_file.release()
             cv2.destroyAllWindows()
 
 # Create an instance of the WebcamFaceMesh class and run the program
-# eor_webcom = EORWebcam()
-# eor_webcom.run()
+eor_webcom = EORWebcam('kawanishi')
+eor_webcom.run()
+
