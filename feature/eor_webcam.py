@@ -195,6 +195,6 @@ class EORWebcam:
             cv2.destroyAllWindows()
 
 # Create an instance of the WebcamFaceMesh class and run the program
-eor_webcom = EORWebcam('kawanishi')
-eor_webcom.run()
+# eor_webcom = EORWebcam('kawanishi')
+# eor_webcom.run()
 
