@@ -53,7 +53,7 @@ class EORWebcam:
         # 動画ファイルの保存設定
         fourcc = cv2.VideoWriter_fourcc(*'XVID')
         # mp4ファイルで出力
-        self.output_file = cv2.VideoWriter('../data/{}/video/{}.mp4'.format(self.name,self.now.strftime('%Y%m%d%H%m%s')), fourcc, 30.0, (640, 480))
+        self.output_file = cv2.VideoWriter('../data/{}/video/{}.mp4'.format(self.name,self.now.strftime('%Y%m%d%H%M%S')), fourcc, 30.0, (640, 480))
     
     def udp_send(self,data,server_ip,server_port):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -76,7 +76,7 @@ class EORWebcam:
 
         print(average_left_eye,average_right_eye)
 
-        if average_left_eye <= 75 or average_right_eye <= 75:
+        if average_left_eye <= 80 or average_right_eye <= 80:
             return True
         
         return False
