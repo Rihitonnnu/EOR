@@ -4,11 +4,9 @@ import cv2
 import mediapipe as mp
 import numpy as np
 import openpyxl
-import pandas as pd
 
-class EORBase:
+class PfhClose:
     def __init__(self,name):
-        self.name=name
         # MediaPipeのFaceMeshモデルを初期化する
         mp_face_mesh = mp.solutions.face_mesh
         self.face_mesh = mp_face_mesh.FaceMesh()
@@ -28,22 +26,15 @@ class EORBase:
 
         self.cnt=0
         # excelファイルを読み込む
-        
+        # self.wb = openpyxl.load_workbook('../data/{}/pfh_close.xlsx'.format(name))
+        # self.sheet = self.wb['Sheet']
 
-        self.df_close = pd.read_excel('../data/{}/pfh_close.xlsx'.format(self.name), sheet_name='Sheet')
-        # カラムごとの平均値を計算する
-        self.average_close = self.df_close.mean()
-
-        #self.averageのlefe_eyeとright_eyeの値を取得する
-        self.average_left_eye_close = self.average_close.iloc[0]
-        self.average_right_eye_close = self.average_close.iloc[1]
-
-        # excelファイルを作成し、1行目にleft_eye_distanceとright_eye_distanceを書き込む
+        #excelファイルを作成し、1行目にleft_eye_distanceとright_eye_distanceを書き込む
         self.wb = openpyxl.Workbook()
         self.sheet = self.wb.active
         self.sheet['A1'] = 'left_eye_distance'
         self.sheet['B1'] = 'right_eye_distance'
-        self.wb.save('../data/kawanishi/eor_base.xlsx')
+        self.wb.save('../data/kawanishi/pfh_close.xlsx')
 
     def run(self):
         try:
@@ -102,9 +93,9 @@ class EORBase:
                         right_eye_corner_distance = np.linalg.norm(
                             right_eye_start - right_eye_end)
 
-                        # 目頭と目尻の距離を1としたときの上まぶたと下まぶたの距離を計算する
-                        # left_eye_distance = (left_eye_distance-self.average_left_eye_close) / left_eye_corner_distance
-                        right_eye_distance = right_eye_distance/ right_eye_corner_distance
+                        # # 目頭と目尻の距離を1としたときの上まぶたと下まぶたの距離を計算する
+                        # left_eye_distance = left_eye_distance / left_eye_corner_distance
+                        # right_eye_distance = right_eye_distance / right_eye_corner_distance
 
                         # openCVのウィンドウに表示する、文字を赤色で描画する
                         cv2.putText(frame, f"left_eye: {left_eye_distance}", (
@@ -113,7 +104,7 @@ class EORBase:
                             10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
                 # 画像を表示する
-                cv2.imshow('MediaPipe FaceMesh', frame)
+                cv2.imshow('PFH CLOSE', frame)
 
                 #excelにleft_eye_distanceとright_eye_distanceを書き込む
                 # self.sheet['A{}'.format(self.cnt+2)] = left_eye_distance
@@ -122,7 +113,7 @@ class EORBase:
 
                 #excelにleft_eye_distanceとright_eye_distanceを最後の行の次の行に書き込む
                 self.sheet.append([left_eye_distance,right_eye_distance])
-                self.wb.save('../data/kawanishi/eor_base.xlsx')
+                self.wb.save('../data/kawanishi/pfh_close.xlsx')
 
                 self.cnt+=1
 
@@ -139,5 +130,5 @@ class EORBase:
             cv2.destroyAllWindows()
 
 # Create an instance of the WebcamFaceMesh class and run the program
-eor_base = EORBase('kawanishi')
-eor_base.run()
+pfh_close = PfhClose('kawanishi')
+pfh_close.run()

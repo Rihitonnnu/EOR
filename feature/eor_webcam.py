@@ -36,19 +36,28 @@ class EORWebcam:
         print(f'frame_height: {self.frame_height}')
 
         # data/hoge/eor_base.xlsxを読み込む
-        self.df = pd.read_excel('../data/{}/eor_base.xlsx'.format(self.name), sheet_name='Sheet')
+        self.df_base = pd.read_excel('../data/{}/eor_base.xlsx'.format(self.name), sheet_name='Sheet')
         # カラムごとの平均値を計算する
-        self.average = self.df.mean()
+        self.average_base = self.df_base.mean()
 
         #self.averageのlefe_eyeとright_eyeの値を取得する
-        self.average_left_eye_base = self.average.iloc[0]
-        self.average_right_eye_base = self.average.iloc[1]
+        self.average_left_eye_base = self.average_base.iloc[0]
+        self.average_right_eye_base = self.average_base.iloc[1]
 
-        #excelファイルを作成し、1行目にleft_eye_opening_rateとright_eye_opening_rateを書き込む
+        self.df_close = pd.read_excel('../data/{}/pfh_close.xlsx'.format(self.name), sheet_name='Sheet')
+        # カラムごとの平均値を計算する
+        self.average_close = self.df_close.mean()
+
+        #self.averageのlefe_eyeとright_eyeの値を取得する
+        self.average_left_eye_close = self.average_close.iloc[0]
+        self.average_right_eye_close = self.average_close.iloc[1]
+
+        #excelファイルを作成し、1行目にcntとleft_eye_opening_rateとright_eye_opening_rateを書き込む
         self.wb = openpyxl.Workbook()
         self.sheet = self.wb.active
-        self.sheet['A1'] = 'left_eye_opening_rate'
-        self.sheet['B1'] = 'right_eye_opening_rate'
+        self.sheet['A1'] = 'cnt'
+        self.sheet['B1'] = 'left_eye_opening_rate'
+        self.sheet['C1'] = 'right_eye_opening_rate'
 
         # 動画ファイルの保存設定
         fourcc = cv2.VideoWriter_fourcc(*'XVID')
@@ -103,8 +112,8 @@ class EORWebcam:
                             if id in [159, 145, 386, 374]:
                                 cx, cy = int(lm.x * w), int(lm.y * h)
                                 # 線で描画する
-                                # cv2.line(frame, (cx - 20, cy),
-                                #         (cx + 20, cy), (0, 255, 0), 1)
+                                cv2.line(frame, (cx - 20, cy),
+                                        (cx + 20, cy), (0, 255, 0), 1)
 
                         # 左目の上まぶたと下まぶたの距離を計算する
                         left_eye_top = np.array(
@@ -139,21 +148,27 @@ class EORWebcam:
                             right_eye_start - right_eye_end)
 
                         # 目頭と目尻の距離を1としたときの上まぶたと下まぶたの距離を計算する
-                        left_eye_distance = left_eye_distance / left_eye_corner_distance
-                        right_eye_distance = right_eye_distance / right_eye_corner_distance
+                        # left_eye_distance = left_eye_distance / left_eye_corner_distance
+                        # right_eye_distance = right_eye_distance / right_eye_corner_distance
 
-                        # 開眼率の計算
-                        left_eye_opening_rate=left_eye_distance/self.average_left_eye_base*100
+                        # print((left_eye_distance-self.average_left_eye_close)/left_eye_corner_distance/(self.average_left_eye_base-self.average_left_eye_close))
+                        print('左は{}'.format((left_eye_distance-self.average_left_eye_close)/left_eye_corner_distance))
+
+                        a=(left_eye_distance-self.average_left_eye_close)/left_eye_corner_distance
+                        b=(self.average_left_eye_base-self.average_left_eye_close)/left_eye_corner_distance
+                        # 開眼率の計算(任意時間の開眼度-開眼時の開眼度/覚醒時の開眼度-閉眼時の開眼度*100)
+                        left_eye_opening_rate=a/b
+
                         right_eye_opening_rate=right_eye_distance/self.average_right_eye_base*100
 
                         # openCVのputText関数を使って、画面に左右の開眼率を表示する
-                        cv2.putText(frame, f'{left_eye_opening_rate:.2f}', (10, 30),
+                        cv2.putText(frame, f'{left_eye_opening_rate*100:.2f}', (10, 30),
                                     cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), thickness=2)
                         cv2.putText(frame, f'{right_eye_opening_rate:.2f}', (10, 60),
                                     cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), thickness=2)
                         
                         # excelファイルに開眼率を書き込む
-                        self.sheet.append([left_eye_opening_rate,right_eye_opening_rate])
+                        self.sheet.append([self.cnt,left_eye_opening_rate,right_eye_opening_rate])
 
                         # 日時をファイル名にする
                         # self.wb.save('../data/{}/{}/eor_{}.xlsx'.format(self.name,now.strftime('%Y%m%d'),now.strftime('%H%m%s')))
@@ -176,8 +191,9 @@ class EORWebcam:
                     # self.sheetの中身をリセットする
                     self.wb = openpyxl.Workbook()
                     self.sheet = self.wb.active
-                    self.sheet['A1'] = 'left_eye_opening_rate'
-                    self.sheet['B1'] = 'right_eye_opening_rate'
+                    self.sheet['A1'] = 'cnt'
+                    self.sheet['B1'] = 'left_eye_opening_rate'
+                    self.sheet['C1'] = 'right_eye_opening_rate'
 
                     # 眠くなったらループを終了する
                     if is_sleepy:
